@@ -23,6 +23,7 @@ def api_multi_question():
     return jsonify({"answer": response})
 
 
+
 @app.route('/', methods=['GET'])
 def index():
     return send_file('./demo/user_input.html')
