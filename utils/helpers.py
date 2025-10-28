@@ -42,11 +42,10 @@ def load_all_scene_configs():
 
     return all_scene_configs
 
-
-def send_message(message, user_input):
-    """
+"""
     请求chatGPT函数
-    """
+"""
+def send_message(message, user_input):
     print('--------------------------------------------------------------------')
     if config.DEBUG:
         print('prompt输入:', message)
@@ -80,11 +79,10 @@ def send_message(message, user_input):
         print(f"Request error: {e}")
         return None
 
-
-def is_slot_fully_filled(json_data):
-    """
+"""
     检查槽位是否完整填充
-    """
+"""
+def is_slot_fully_filled(json_data):
     # 遍历JSON数据中的每个元素
     for item in json_data:
         # 检查value字段是否为空字符串

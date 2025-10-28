@@ -1,4 +1,14 @@
 {
+    "other_scenario": {
+    "name": "通用查询",
+    "description": "未命中特定服务场景时的兜底分类，用于触发RAG检索以回答用户问题",
+    "parameters": []
+  },
+  "greeting": {
+    "name": "问候处理",
+    "description": "处理用户的问候语，如中文‘你好’、英文‘hello’等常见打招呼用语",
+    "parameters": []
+  },
   "weather_query": {
     "name": "问天气",
     "description": "天气信息查询服务",
@@ -43,24 +53,6 @@
       {
         "name": "酒店档次",
         "desc": "酒店的档次，如豪华、经济等",
-        "type": "string",
-        "required": true
-      }
-    ]
-  },
-  "fund_consultation": {
-    "name": "公积金咨询",
-    "description": "公积金咨询",
-    "parameters": [
-      {
-        "name": "事件",
-        "desc": "买房、租房、退休",
-        "type": "string",
-        "required": true
-      },
-      {
-        "name": "购买房屋类型",
-        "desc": "买房事件时需要 经济适用房、新房、二手房",
         "type": "string",
         "required": true
       }

@@ -9,10 +9,13 @@ from utils.helpers import send_message
 
 class ChatbotModel:
     def __init__(self, scene_templates: dict):
-        self.scene_templates: dict = scene_templates
-        self.current_purpose: str = ''
-        self.processors = {}
+        self.scene_templates: dict = scene_templates # 所有场景模板
+        self.current_purpose: str = '' # 当前上文对话的意图场景
+        self.processors = {} # 场景处理器对象(每一个场景都有一个场景处理器对象)
 
+    """
+        加载场景处理器对象
+    """
     @staticmethod
     def load_scene_processor(self, scene_config):
         try:
@@ -20,29 +23,32 @@ class ChatbotModel:
         except (ImportError, AttributeError, KeyError):
             raise ImportError(f"未找到场景处理器 scene_config: {scene_config}")
 
-    def is_related_to_last_intent(self, user_input):
-        """
+    """
         判断当前输入是否与上一次意图场景相关
-        """
+    """
+    def is_related_to_last_intent(self, user_input):
         if not self.current_purpose:
             return False
         prompt = f"判断当前用户输入内容与当前对话场景的关联性:\n\n当前对话场景: {self.scene_templates[self.current_purpose]['description']}\n当前用户输入: {user_input}\n\n这两次输入是否关联（仅用小数回答关联度，得分范围0.0至1.0）"
         result = send_message(prompt, None)
         return extract_float(result) > RELATED_INTENT_THRESHOLD
 
+    """
+        识别本次对话的意图场景（新对话）
+    """
     def recognize_intent(self, user_input):
         # 根据场景模板生成选项
         purpose_options = {}
         purpose_description = {}
-        index = 1
+        index = 0
         for template_key, template_info in self.scene_templates.items():
             purpose_options[str(index)] = template_key
             purpose_description[str(index)] = template_info["description"]
             index += 1
         options_prompt = "\n".join([f"{key}. {value} - 请回复{key}" for key, value in purpose_description.items()])
-        options_prompt += "\n0. 其他场景 - 请回复0"
+        # options_prompt += "\n0. 其他场景 - 请回复0"
 
-        # 发送选项给用户
+        # 将用户此次的输入与定制的场景进行匹配
         user_choice = send_message(f"有下面多种场景，需要你根据用户输入进行判断，只答选项\n{options_prompt}\n用户输入：{user_input}\n请回复序号：", user_input)
 
         logging.debug(f'purpose_options: %s', purpose_options)
@@ -51,8 +57,8 @@ class ChatbotModel:
         user_choices = extract_continuous_digits(user_choice)
 
         # 根据用户选择获取对应场景
-        if user_choices and user_choices[0] != '0':
-            self.current_purpose = purpose_options[user_choices[0]]
+        # if user_choices and user_choices[0] != '0':
+        self.current_purpose = purpose_options[user_choices[0]]
 
         if self.current_purpose:
             print(f"用户选择了场景：{self.scene_templates[self.current_purpose]['name']}")
@@ -61,6 +67,9 @@ class ChatbotModel:
             # 用户输入的选项无效的情况，可以进行相应的处理
             print("无效的选项，请重新选择")
 
+    '''
+        按需创建并缓存某个场景的处理器对象
+    '''
     def get_processor_for_scene(self, scene_name):
         if scene_name in self.processors:
             return self.processors[scene_name]
@@ -73,12 +82,12 @@ class ChatbotModel:
         self.processors[scene_name] = processor_class
         return self.processors[scene_name]
 
-    def process_multi_question(self, user_input):
-        """
+    """
         处理多轮问答
         :param user_input:
         :return:
-        """
+    """
+    def process_multi_question(self, user_input):
         # 检查当前输入是否与上一次的意图场景相关
         if self.is_related_to_last_intent(user_input):
             pass
